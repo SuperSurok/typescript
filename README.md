@@ -9,7 +9,7 @@
    - [`Required<Type>`](#Required<Type>)
    - [`Record<Keys,Type>`](#Record<Keys,Type>)
    - [`Readonly<Type>`](#Readonly<Type>)
-   - [`Pick<Type,Keys>`](#Pick<Type,Keys>)
+   - [`Pick<Type,Keys>`](#picktypekeys)
 
 ### Utility Types
 
