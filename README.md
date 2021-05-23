@@ -10,6 +10,8 @@
    - [`Record<Keys,Type>`](#recordkeystype)
    - [`Readonly<Type>`](#readonlytype)
    - [`Pick<Type,Keys>`](#picktypekeys)
+   - [`Omit<Type,Keys>`](#omittypekeys)
+   - [`Excluded<Type,ExcludedUnion>`](#excludedtypeexcludedunion)
 
 ### Utility Types
 
@@ -122,4 +124,52 @@ const todo: TodoPreview = {
 };
 
 todo; // => const todo: TodoPreview
+```
+
+#### `Omit<Type,Keys>`
+
+Создаёт тип, беря все свойства из `Type` и затем удаляет `Keys`\
+(строковый литерал или объединение строковых литералов).
+
+##### Пример
+
+```ts
+type Todo = {
+  title: string;
+  description: string;
+  completed: boolean;
+  createAt: number;
+};
+
+type TodoPreview = Omit<Todo, "description">;
+
+const todo: TodoPreview = {
+  title: "Clean room",
+  completed: false,
+  createAt: 1615544252770,
+};
+
+todo; // => const todo: TodoPreview;
+
+type TodoInfo = Omit<Todo, "completed" | "createAt">;
+
+const todoInfo: TodoInfo = {
+  title: "Pick up kids",
+  description: "Kindergarten closes at 5pm",
+};
+
+todoInfo; // => const todoInfo: TodoInfo
+```
+
+#### Excluded<Type,ExcludedUnion>
+
+Создаёт тип исключая из `<Type>` все члены объединения объявленные в `ExcludedUnion`.
+
+##### Пример
+
+```ts
+type T0 = Exclude<"a" | "b" | "c", "a">; // type T0 = "a" | "b";
+type T1 = Exclude<"a" | "b" | "c", "a" | "b">; // type T1 = "c";
+type T2 = Exclude<string | number | (() => void), Function> // type T2 = string | number;
+
 ```
