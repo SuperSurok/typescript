@@ -5,11 +5,11 @@
 ## Содержание
 
 1. [Utility Types](#utility-types)
-   - [`Partial<Type>`](#Partial<Type>)
-   - [`Required<Type>`](#Required<Type>)
-   - [`Record<Keys,Type>`](#Record<Keys,Type>)
-   - [`Readonly<Type>`](#Readonly<Type>)
-   - [`Pick<Type,Keys>`](#Pick<Type,Keys>)
+   - [`Partial<Type>`](#partialtype)
+   - [`Required<Type>`](#requiredtype)
+   - [`Record<Keys,Type>`](#recordkeystype)
+   - [`Readonly<Type>`](#readonlytype)
+   - [`Pick<Type,Keys>`](#picktypekeys)
 
 ### Utility Types
 
