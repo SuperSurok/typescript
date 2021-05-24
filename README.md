@@ -15,7 +15,7 @@
 
 ### Utility Types
 
-#### Partial<Type>
+#### `Partial<Type>`
 
 Возвращает `Type` с опциональными полями.
 
@@ -41,7 +41,7 @@ const todo2 = updateTodo(todo1, {
 });
 ```
 
-#### Required<Type>
+#### `Required<Type>`
 
 Создаёт тип в котором обязательны все свойства `Type`.\
 Противоположность `Partial`.
@@ -58,7 +58,7 @@ const obj: Props = { a: 5 };
 const obj2: Required<Props> = { a: 5 }; // => ошибка
 ```
 
-#### Readonly<Type>
+#### `Readonly<Type>`
 
 Создаёт тип со всеми свойствами `<Type>` только для чтения.\
 Означает, что свойства типа не могут быть переопределены.
@@ -77,11 +77,11 @@ const todo: Readonly<Todo> = {
 todo.title = "Hello!"; // => ошибка
 ```
 
-#### Record<Keys,Type>
+#### `Record<Keys,Type>`
 
-Создаёт объект типа чьи ключи(keys) являются ключами Keys, а значения(values) это значения Type.  
+Создаёт объект типа, где ключи(keys) являются ключами Keys, могут быть `string | number | symbol`, а значения(values) являются значениями Type.  
 Эта утилита может быть полезна для сопоставления свойств одного типа с другим типом.  
-Даёт возможность составить одни тип из двух типов.
+Даёт возможность составить один тип из двух типов.\
 
 ##### Пример
 
@@ -102,9 +102,9 @@ const cats: Record<CatName, CatInfo> = {
 cats.boris; // => const cats: Record<CatName, CatInfo>
 ```
 
-#### Pick<Type,Keys>
+#### `Pick<Type,Keys>`
 
-Создаёт тип собирая набор необходимых свойств `Keys` \
+Создаёт тип собирая набор необходимых свойств `Keys`\
 (строковый литерал или объединение строковых литералов) из `<Type>`
 
 ##### Пример
@@ -116,7 +116,7 @@ type Todo = {
   completed: boolean;
 };
 
-type TodoPreview = Pick<Todo, "titile" | "cpmpleted">;
+type TodoPreview = Pick<Todo, "title" | "completed">;
 
 const todo: TodoPreview = {
   title: "Clean room",
@@ -124,11 +124,19 @@ const todo: TodoPreview = {
 };
 
 todo; // => const todo: TodoPreview
+
+const todo2: TodoPreview = {
+  title: "Clean flat",
+  completed: true,
+  description: "Moving fast",
+};
+
+todo2; // => ошибка
 ```
 
 #### `Omit<Type,Keys>`
 
-Создаёт тип, беря все свойства из `Type` и затем удаляет `Keys`\
+Создаёт тип, беря все свойства из `Type` и затем удаляет указанные `Keys`\
 (строковый литерал или объединение строковых литералов).
 
 ##### Пример
@@ -151,6 +159,15 @@ const todo: TodoPreview = {
 
 todo; // => const todo: TodoPreview;
 
+const todo2: TodoPreview = {
+   title: "Clean room",
+   completed: false,
+   createAt: 1615544252770,
+   description: "Get clean gel",
+};
+
+todo2 // ошибка
+
 type TodoInfo = Omit<Todo, "completed" | "createAt">;
 
 const todoInfo: TodoInfo = {
@@ -159,6 +176,7 @@ const todoInfo: TodoInfo = {
 };
 
 todoInfo; // => const todoInfo: TodoInfo
+
 ```
 
 #### Excluded<Type,ExcludedUnion>
@@ -168,8 +186,7 @@ todoInfo; // => const todoInfo: TodoInfo
 ##### Пример
 
 ```ts
-type T0 = Exclude<"a" | "b" | "c", "a">; // type T0 = "a" | "b";
+type T0 = Exclude<"a" | "b" | "c", "a">; // type T0 = "b" | "c";
 type T1 = Exclude<"a" | "b" | "c", "a" | "b">; // type T1 = "c";
-type T2 = Exclude<string | number | (() => void), Function> // type T2 = string | number;
-
+type T2 = Exclude<string | number | (() => void), Function>; // type T2 = string | number;
 ```
