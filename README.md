@@ -12,6 +12,10 @@
    - [`Pick<Type,Keys>`](#picktypekeys)
    - [`Omit<Type,Keys>`](#omittypekeys)
    - [`Excluded<Type,ExcludedUnion>`](#excludedtypeexcludedunion)
+   - [`Extract<Type,Union>`](#extracttypeunion)
+   - [`NonNullable<Type>`](#nonnullabletype)
+   - [`Parameters<Type>`](#parameterstype)
+   - [`ConstructorParameters<Type>`](#constructorparameterstype)
 
 ### Utility Types
 
@@ -160,13 +164,13 @@ const todo: TodoPreview = {
 todo; // => const todo: TodoPreview;
 
 const todo2: TodoPreview = {
-   title: "Clean room",
-   completed: false,
-   createAt: 1615544252770,
-   description: "Get clean gel",
+  title: "Clean room",
+  completed: false,
+  createAt: 1615544252770,
+  description: "Get clean gel",
 };
 
-todo2 // ошибка
+todo2; // ошибка
 
 type TodoInfo = Omit<Todo, "completed" | "createAt">;
 
@@ -176,7 +180,6 @@ const todoInfo: TodoInfo = {
 };
 
 todoInfo; // => const todoInfo: TodoInfo
-
 ```
 
 #### Excluded<Type,ExcludedUnion>
@@ -189,4 +192,92 @@ todoInfo; // => const todoInfo: TodoInfo
 type T0 = Exclude<"a" | "b" | "c", "a">; // type T0 = "b" | "c";
 type T1 = Exclude<"a" | "b" | "c", "a" | "b">; // type T1 = "c";
 type T2 = Exclude<string | number | (() => void), Function>; // type T2 = string | number;
+```
+
+#### `Extract<Type,Union>`
+
+Создаёт тип извлекая из `Type` все объединённые члены присвоенные `Union`.
+
+##### Пример
+
+```ts
+type T0 = Extract<"a" | "b" | "c", "a" | "f">; // => T0 = "a"
+type T1 = Extract<string | number | (() => void), Function>; // => T0 = () => void
+```
+
+#### `NonNullable<Type>`
+
+Создаёт тип из `Type`, исключая из него `null` и `undefined`.
+
+##### Пример
+
+```ts
+type T0 = NonNullable<string | number | undefined>; // => type T0 = string | number
+type T0 = NonNullable<string[] | null | undefined>; // => type T0 = string[]
+```
+
+#### `Parameters<Type>`
+
+Создаёт тип кортеж из типов, используемых в параметрах функции типа `Type`.
+
+##### Пример
+
+```ts
+declare function f1(arg: { a: number; b: number }): void;
+
+type T0 = Parameters<() => string>; // typeT0 = [];
+
+type T1 = Parameters<(s: string) => void>; // => type T1 = [s: string];
+
+type T2 = Parameters<<T>(arg: T) => T>; // => type T2 = [arg: unknown];
+
+type T3 = Parameters<typeof f1>; // =>
+/*
+ * type T3 = [arg: {
+ *  a: number;
+ *  b: string;
+ * }];
+ */
+
+type T4 = Parameters<any>; // => type T4 = unknown[];
+
+type T5 = Parameters<never>; // => type T5 = never;
+
+type T6 = Parameters<string>; // => Type 'string' does not satisfy the constraint '(...args: any) => any'.
+// type T6 = never;
+
+type T7 = Parameters<Function>; // =>
+/* 
+* Type 'Function' does not satisfy the constraint '(...args: any) => any'.
+* Type 'Function' provides no match for the signature '(...args: any): any'.
+* type T7 = never;
+*/
+```
+
+#### `ConstructorParameters<Type>`
+
+Создаёт кортеж или массив типа из типов функции конструктора.\
+Производит кортеж типов со всеми параметрами типов (или типом `never` если `Type` не функция).
+
+##### Пример
+
+```ts
+type T0 = ConstructorParameters<ErrorConstructor>;
+// => type T0 = [message?: string];
+
+type T1 = ConstructorParameters<FunctionConstructor>;
+// => type T1 = string[];
+
+type T2 = ConstructorParameters<RegExpConstructor>;
+// => type T2 = [pattern: string | RegExp, flags?: string];
+
+type T3 = ConstructorParameters<any>;
+// => typeT3 = unknown[];
+
+type T4 = ConstructorParameters<Function>;
+// => type T4 = never;
+/*
+* Type 'Function' does not satisfy the constraint 'abstract new (...args: any) => any'.
+*  Type 'Function' provides no match for the signature 'new (...args: any): any'.
+*/
 ```
