@@ -4,18 +4,55 @@
 
 ## Содержание
 
-1. [Utility Types](#utility-types)
-   - [`Partial<Type>`](#partialtype)
-   - [`Required<Type>`](#requiredtype)
-   - [`Record<Keys,Type>`](#recordkeystype)
-   - [`Readonly<Type>`](#readonlytype)
-   - [`Pick<Type,Keys>`](#picktypekeys)
-   - [`Omit<Type,Keys>`](#omittypekeys)
-   - [`Excluded<Type,ExcludedUnion>`](#excludedtypeexcludedunion)
-   - [`Extract<Type,Union>`](#extracttypeunion)
-   - [`NonNullable<Type>`](#nonnullabletype)
-   - [`Parameters<Type>`](#parameterstype)
-   - [`ConstructorParameters<Type>`](#constructorparameterstype)
+[Basic Types](#utility-types)
+
+- [Primitives](#primitives)
+- [Arrays](#arrays)
+- [any](#any)
+- [Type Annotations on Variables](#typeannotationsonvariables)
+
+[Utility Types](#utility-types)
+
+- [`Partial<Type>`](#partialtype)
+- [`Required<Type>`](#requiredtype)
+- [`Record<Keys,Type>`](#recordkeystype)
+- [`Readonly<Type>`](#readonlytype)
+- [`Pick<Type,Keys>`](#picktypekeys)
+- [`Omit<Type,Keys>`](#omittypekeys)
+- [`Excluded<Type,ExcludedUnion>`](#excludedtypeexcludedunion)
+- [`Extract<Type,Union>`](#extracttypeunion)
+- [`NonNullable<Type>`](#nonnullabletype)
+- [`Parameters<Type>`](#parameterstype)
+- [`ConstructorParameters<Type>`](#constructorparameterstype)
+
+### Basic Types
+
+#### `Primitives`
+
+- `string` - отображает строковые значения "TypeScript"
+- `number` - отображает числовые значения 1982. Как целочисленные, так и с плавающей точкой
+- `boolean` - применяется для `ture` и `false`
+
+#### `Arrays`
+
+- `number[]`, `string[]`, `Array<number>` - синтаксис для описания данных в массиве.
+
+#### `any`
+
+Это особый общий тип, который применяется, когда нет возможности точно определить тип элемента.\
+Его следует избегать, так как `any` предоставляет возможность присваивать любое значение типу и выполнять\
+любые операции с ними. Таким образом утрачивается возможность проверки типов.
+
+#### `Type Annotations on Variables`
+
+При объявлении переменной `const`, `let`, `var` опционально можно явно добавить аннотацию типа.
+
+```ts
+let myName: string = "Alice";
+```
+TS не использует левосторонний стиль присваивания, как `int x = 0`. Аннотации типов всегда будут идти после присваивания.\
+В большинстве случаев TS автоматически выводит типы. 
+
 
 ### Utility Types
 
@@ -247,11 +284,11 @@ type T6 = Parameters<string>; // => Type 'string' does not satisfy the constrain
 // type T6 = never;
 
 type T7 = Parameters<Function>; // =>
-/* 
-* Type 'Function' does not satisfy the constraint '(...args: any) => any'.
-* Type 'Function' provides no match for the signature '(...args: any): any'.
-* type T7 = never;
-*/
+/*
+ * Type 'Function' does not satisfy the constraint '(...args: any) => any'.
+ * Type 'Function' provides no match for the signature '(...args: any): any'.
+ * type T7 = never;
+ */
 ```
 
 #### `ConstructorParameters<Type>`
@@ -277,7 +314,7 @@ type T3 = ConstructorParameters<any>;
 type T4 = ConstructorParameters<Function>;
 // => type T4 = never;
 /*
-* Type 'Function' does not satisfy the constraint 'abstract new (...args: any) => any'.
-*  Type 'Function' provides no match for the signature 'new (...args: any): any'.
-*/
+ * Type 'Function' does not satisfy the constraint 'abstract new (...args: any) => any'.
+ *  Type 'Function' provides no match for the signature 'new (...args: any): any'.
+ */
 ```
