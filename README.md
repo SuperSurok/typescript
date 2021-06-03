@@ -9,7 +9,10 @@
 - [Primitives](#primitives)
 - [Arrays](#arrays)
 - [any](#any)
-- [Type Annotations on Variables](#typeannotationsonvariables)
+- [Type Annotations on Variables](#type-annotations-on-variables)
+- [Functions](#functions)
+
+[Object Types](#object-types)
 
 [Utility Types](#utility-types)
 
@@ -50,9 +53,69 @@
 ```ts
 let myName: string = "Alice";
 ```
-TS не использует левосторонний стиль присваивания, как `int x = 0`. Аннотации типов всегда будут идти после присваивания.\
-В большинстве случаев TS автоматически выводит типы. 
 
+TS не использует левосторонний стиль присваивания, как `int x = 0`. Аннотации типов всегда будут идти после присваивания.\
+В большинстве случаев TS автоматически выводит типы.
+
+#### Functions
+
+TS позволяет определять тип параметров и получаемого результата.
+
+##### Parameters
+
+Можно добавлять тип для каждого параметра, который принимает функция.
+Если не типизировать параметры, TS будет проверять правильное количество\
+переданных аргументов.
+
+```ts
+function greet(name: string) {
+  console.log(`Hello, ${name.toUpperCase()} !`);
+}
+greet(42); // => Error
+```
+
+##### Return Value
+
+В большинстве случаев нет необходимости указывать возвращаемый тип, \
+т.к. TS устанавливает тип на основании возвращаемого значения
+
+```ts
+function getFavoriteNumber(): number {
+  return 10;
+}
+```
+
+##### Anonymous Functions
+
+Анонимные функции имеют небольшое отличие от определения функций.\
+Когда функция появляется в месте, где TS может определить, как она будет вызываться,\
+параметрам этой функции автоматически присваиваются типы.
+
+##### Пример
+
+```ts
+const names = ["Alice", "Bob", "Eve"];
+// Контекстное типизирование для функции
+names.forEach((s) => console.log(s.toUppercase())); // => Error
+```
+
+### Object Types
+
+Чтобы описать тип объекта, нужно просто перечислить его свойства и присвоить им типы.
+
+##### Пример
+Определим параметр типом с двумя свойствами `x` и `y`, которые являются числами.\
+Для разделения свойств можно использовать `,` или `;`\
+Типизирование каждого свойства необязательно. Если не определить тип,\
+он примет тип `any`.
+```ts
+function printCoord(pt: { x: number; y: number }) {
+  console.log(`The coordinate's x value is ${pt.x}`);
+  console.log(`The coordinate's y value is ${pt.y}`);
+}
+
+printCoord({ x: 3, y: 7 });
+```
 
 ### Utility Types
 
