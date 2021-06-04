@@ -14,6 +14,12 @@
 
 [Object Types](#object-types)
 
+- [Optional Properties](#optional-properties)
+
+[Union Types](#union-types)
+
+- [Defining a Union Type](#defining-a-union-type)
+
 [Utility Types](#utility-types)
 
 - [`Partial<Type>`](#partialtype)
@@ -104,10 +110,12 @@ names.forEach((s) => console.log(s.toUppercase())); // => Error
 Чтобы описать тип объекта, нужно просто перечислить его свойства и присвоить им типы.
 
 ##### Пример
+
 Определим параметр типом с двумя свойствами `x` и `y`, которые являются числами.\
 Для разделения свойств можно использовать `,` или `;`\
 Типизирование каждого свойства необязательно. Если не определить тип,\
 он примет тип `any`.
+
 ```ts
 function printCoord(pt: { x: number; y: number }) {
   console.log(`The coordinate's x value is ${pt.x}`);
@@ -115,6 +123,67 @@ function printCoord(pt: { x: number; y: number }) {
 }
 
 printCoord({ x: 3, y: 7 });
+```
+
+#### Optional Properties
+
+Тип объекта также может указывать, что некоторые или все свойства объекта опциональны.
+
+```ts
+function printName(obj: { fist: string; last?: string }) {
+  console.log(`${obj.fist.toUpperCase()}} ${last.last?.toUpperCase()}`);
+}
+
+printName({ fist: "Alice" }); // => ok
+printName({ fist: "Alice", last: "Alisson" }); // => ok
+```
+
+### Union Types
+
+TS позволяет строить новые типы на основе существующих, путём их комбинирования.
+
+#### Defining a Union Type
+
+```ts
+function printId(id: number | string) {
+  console.log(printId);
+}
+printId(100); // => ok
+printId("200"); // => ok
+printId({ id: "200" }); // => error
+```
+
+Работая с типом объединения, нужно помнить, что методы, применяемые к нему должны быть валидны для каждого члена.
+
+##### Пример
+
+```ts
+function printId(id: number | string) {
+  console.log(id.toUpperCase()); // => error
+}
+```
+
+##### Правильно
+
+```ts
+function printId(id: number | string) {
+  if (typeof is === "string") {
+    console.log(id.toUpperCase());
+  }
+  console.log(id);
+}
+
+function welcomePeople(x: string[] | string) {
+  if (Array.isArray(x)) {
+    console.log(`Hello, ${x.join(" and ")}`);
+  }
+
+  console.log(`Welcome ${x}`);
+}
+
+function getFirstFree(x: number[] | number) {
+  return s.slice(0, 3);
+}
 ```
 
 ### Utility Types
