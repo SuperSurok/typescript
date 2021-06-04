@@ -4,7 +4,7 @@
 
 ## Содержание
 
-[Basic Types](#utility-types)
+[Basic Types](#basic-types)
 
 - [Primitives](#primitives)
 - [Arrays](#arrays)
