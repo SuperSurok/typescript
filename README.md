@@ -181,8 +181,8 @@ function welcomePeople(x: string[] | string) {
   console.log(`Welcome ${x}`);
 }
 
-function getFirstFree(x: number[] | number) {
-  return s.slice(0, 3);
+function getFirstFree(x: number[] | string) {
+  return x.slice(0, 3);
 }
 ```
 
