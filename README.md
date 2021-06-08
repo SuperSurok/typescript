@@ -20,6 +20,11 @@
 
 - [Defining a Union Type](#defining-a-union-type)
 
+[Type Aliases](#type-aliases)
+
+[Interfaces](#interfaces)
+[Differences Between Type Aliases and Interfaces](#differences-between-type-aliases-and-interfaces)
+
 [Utility Types](#utility-types)
 
 - [`Partial<Type>`](#partialtype)
@@ -184,6 +189,122 @@ function welcomePeople(x: string[] | string) {
 function getFirstFree(x: number[] | string) {
   return x.slice(0, 3);
 }
+```
+
+### Type Aliases
+
+Для многократного использования типов применяются `Type Aliases` или псевдонимы типов.\
+Под псевдонимом подразумевается название типа. Название можно задать для любого типа.
+
+##### Пример
+
+```ts
+type Point = {
+  x: number;
+  y: number;
+};
+
+function printCoord(pt: Point) {
+  console.log(`The coordinate's x value is ${pt.x}`);
+  console.log(`The coordinate's y value is ${pt.y}`);
+}
+
+printCoord({ x: 100, y: 100 });
+
+type ID = number | string;
+```
+
+### Interfaces
+
+Интерфейс — это альтернативный способ наименования типов.
+
+##### Пример
+
+```ts
+interface Point {
+  x: number;
+  y: number;
+}
+
+function printCoord(pt: Point) {
+  console.log(`The coordinate's x value is ${pt.x}`);
+  console.log(`The coordinate's y value is ${pt.y}`);
+}
+
+pringCoord({ x: 100, y: 100 });
+```
+
+В TS применяется структурная типизация.\
+Это означает, что типизация происходит на основании состава членов.
+
+##### Пример
+
+```ts
+interface Name {
+  name: string;
+}
+
+class Lodger {
+  name: string;
+}
+
+let p: Lodger;
+p = new Lodger();
+```
+
+### Differences Between Type Aliases and Interfaces
+
+Псевдонимы типов и интерфейсы очень похожи.\
+Ключевое отличие заключается в том, что типы не могут быть переоткрыты для добавления новых свойств.
+Интерфейсы всегда расширяемы.
+
+##### Расширение интерфейса
+
+```ts
+interface Animal {
+  name: string;
+}
+
+interface Bear extends Animal {
+  honey: boolean;
+}
+```
+
+Добавление новых полей к интерфейсу
+
+```ts
+interface Window {
+  title: string;
+}
+
+interface Window {
+  ts: TypeScriptApi;
+}
+```
+
+##### Расширение типа через пересечение
+
+```ts
+type Animal = {
+  name: string;
+};
+
+type Bear = Animal & {
+  honey: boolean;
+};
+```
+
+Тип не может быть изменён после создания
+
+```ts
+type Window = {
+  title: string;
+};
+
+type Window = {
+  ts: TypeScriptApi;
+};
+// Error: Duplicate identifier 'Window'
 ```
 
 ### Utility Types
