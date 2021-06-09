@@ -2,7 +2,7 @@
 
 #### Lebedev Sergey
 
-## Содержание
+## Table of Contents
 
 [Basic Types](#basic-types)
 
@@ -24,6 +24,9 @@
 
 [Interfaces](#interfaces)
 [Differences Between Type Aliases and Interfaces](#differences-between-type-aliases-and-interfaces)
+[Type Assertions](#type-assertions)
+[Literal Types](#literal-types) - [Literal Inference](#literal-inference)
+[null and undefined](#null-and-undefined)
 
 [Utility Types](#utility-types)
 
@@ -99,7 +102,7 @@ function getFavoriteNumber(): number {
 ##### Anonymous Functions
 
 Анонимные функции имеют небольшое отличие от определения функций.\
-Когда функция появляется в месте, где TS может определить, как она будет вызываться,\
+Когда функция появляется в месте, где TS может определить, как она будет вызываться, \
 параметрам этой функции автоматически присваиваются типы.
 
 ##### Пример
@@ -110,6 +113,8 @@ const names = ["Alice", "Bob", "Eve"];
 names.forEach((s) => console.log(s.toUppercase())); // => Error
 ```
 
+**[⬆ back to top](#table-of-contents)**
+
 ### Object Types
 
 Чтобы описать тип объекта, нужно просто перечислить его свойства и присвоить им типы.
@@ -118,7 +123,7 @@ names.forEach((s) => console.log(s.toUppercase())); // => Error
 
 Определим параметр типом с двумя свойствами `x` и `y`, которые являются числами.\
 Для разделения свойств можно использовать `,` или `;`\
-Типизирование каждого свойства необязательно. Если не определить тип,\
+Типизирование каждого свойства необязательно. Если не определить тип, \
 он примет тип `any`.
 
 ```ts
@@ -142,6 +147,8 @@ function printName(obj: { fist: string; last?: string }) {
 printName({ fist: "Alice" }); // => ok
 printName({ fist: "Alice", last: "Alisson" }); // => ok
 ```
+
+**[⬆ back to top](#table-of-contents)**
 
 ### Union Types
 
@@ -191,6 +198,8 @@ function getFirstFree(x: number[] | string) {
 }
 ```
 
+**[⬆ back to top](#table-of-contents)**
+
 ### Type Aliases
 
 Для многократного использования типов применяются `Type Aliases` или псевдонимы типов.\
@@ -213,6 +222,8 @@ printCoord({ x: 100, y: 100 });
 
 type ID = number | string;
 ```
+
+**[⬆ back to top](#table-of-contents)**
 
 ### Interfaces
 
@@ -251,6 +262,8 @@ class Lodger {
 let p: Lodger;
 p = new Lodger();
 ```
+
+**[⬆ back to top](#table-of-contents)**
 
 ### Differences Between Type Aliases and Interfaces
 
@@ -305,6 +318,138 @@ type Window = {
   ts: TypeScriptApi;
 };
 // Error: Duplicate identifier 'Window'
+```
+
+**[⬆ back to top](#table-of-contents)**
+
+### Type Assertions
+
+Иногда TS не может определить точный тип значения.\
+Для таких ситуаций применяется утверждение типа.
+
+Нужно отметить, важную деталь, утверждение типа удаляется во время компилирования, \
+поэтому во время выполнения программы не будет проверки связанной с утверждением типов.\
+В связи с чем, не будет указано исключение или `null`, если утверждение типа указано неправильно.
+
+##### Пример
+
+```ts
+const canvas = document.getElementById("convas") as HTMLCanvasElement;
+
+const anotherCanvas = <HTMLCanvasElement>(
+  document.getElementById("anotherCanvas")
+);
+```
+
+**[⬆ back to top](#table-of-contents)**
+
+### Literal Types
+
+Тип представляющий только одно значение.
+При обычном определении типов `string` или `number` существует возможность переопределить значение переменной.
+
+```ts
+let change = "Hello!";
+change = "Bye!"; // => ok
+```
+
+Литерал типа не позволяет менять значение переменной.
+
+```ts
+let anotherChange: "Hello!" = "Hello!";
+anotherChange = "Hello!";
+anotherChange = "Bye!"; // => error
+```
+
+Можно создавать объединения литералов.
+
+```ts
+function someText(text: string, align: "center" | "left" | "right") {
+  // align text...
+}
+someText("Intresting note", "bottom"); // => error
+```
+
+Можно комбинировать с более сложными типами.
+
+```ts
+type Witdh = {
+  width: number;
+};
+
+function createOption(w: Witdh | "auto") {
+  // do options
+}
+
+createOption("100px"); // => error
+```
+
+#### Literal Inference
+
+При инициализации переменной с объектом TS предполагает, что свойства объекта могут быть изменены.
+
+```ts
+const obj = { value: 1 };
+obj.value = 3; // => ok
+```
+
+При использовании строк получим ошибку.
+TS считает, что код может измениться между созданием объекта и вызовом функции, которая может присвоить новое значение.
+
+```ts
+const req = {
+  url: "https://api.github",
+  method: "GET",
+  value: 2,
+};
+
+function handle(param1: string, param2: "GET" | "POST", param3: 2) {
+  console.log(param1, param2, param3);
+}
+
+handle(req.url, req.method, req.value); // Argument of type 'string' is not assignable to parameter of type '"GET" | "POST"'.
+```
+
+Есть два способа обработки этой ошибки.
+
+1. Можно добавить утверждение типа для свойства объекта
+
+```ts
+const req = {
+  url: "https://api.github",
+  method: "GET" as "GET",
+  value: 2,
+};
+```
+
+2. Можно использовать утверждение типа `as const` для всего объекта
+
+```ts
+const req = {
+  url: "https://api.github",
+  method: "GET",
+  value: 2,
+} as const;
+```
+
+**[⬆ back to top](#table-of-contents)**
+
+### null and undefined
+
+`strictNullChecks` <b>off</b>
+С опцией `strictNullChecks` <b>off</b> к значениям, которые могут быть `null` или `undefined` остаётся доступ в обычном \
+режиме. Так же `null` и `undefined` могут быть присвоены свойству любого типа. Отсутствие проверки этих типов ведёт \
+к большому количеству ошибок. Рекомендуется всегда включать проверку `strictNullChecks`.
+
+`strictNullChecks` <b>on</b>
+С опцией `strictNullChecks` <b>on</b>, когда значение равно `null` или `undefined`, необходимо выполнить проверку этого \
+значения.
+
+```ts
+function doSomething(x: string | null) {
+  if (x === null) return;
+  console.log(`Hello, ${x}`);
+}
 ```
 
 ### Utility Types
@@ -375,7 +520,7 @@ todo.title = "Hello!"; // => ошибка
 
 Создаёт объект типа, где ключи(keys) являются ключами Keys, могут быть `string | number | symbol`, а значения(values) являются значениями Type.  
 Эта утилита может быть полезна для сопоставления свойств одного типа с другим типом.  
-Даёт возможность составить один тип из двух типов.\
+Даёт возможность составить один тип из двух типов.
 
 ##### Пример
 
@@ -571,3 +716,5 @@ type T4 = ConstructorParameters<Function>;
  *  Type 'Function' provides no match for the signature 'new (...args: any): any'.
  */
 ```
+
+**[⬆ back to top](#table-of-contents)**
