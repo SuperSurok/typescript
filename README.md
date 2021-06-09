@@ -28,10 +28,17 @@
 
 [Type Assertions](#type-assertions)
 
-[Literal Types](#literal-types) 
+[Literal Types](#literal-types)
+
 - [Literal Inference](#literal-inference)
 
 [null and undefined](#null-and-undefined)
+
+[Non-null Assertion Operator (Postfix !)](<#non-null-assertion-operator-(postfix-!)>)
+
+[Enums](#enums)
+
+- [Numeric Enums](#numeric-enums)
 
 [Utility Types](#utility-types)
 
@@ -455,6 +462,67 @@ function doSomething(x: string | null) {
   console.log(`Hello, ${x}`);
 }
 ```
+
+**[⬆ back to top](#table-of-contents)**
+
+### Non-null Assertion Operator (Postfix !)
+
+TS имеет специальный синтаксис для удаления `null` и `undefined` из типа без явной проверки. \
+Для этого нужно написать `!` после любого выражения. Это эффективное утверждение типа, что значение \
+не является `null` или `undefined`.
+
+**[⬆ back to top](#table-of-contents)**
+
+### Enums
+
+Enums или перечисления — это фича, добавленная в JS из TS, которая позволяет описывать значение, \
+являющееся одним из возможного набора именованных констант. В отличие от большинства TS фич, это не уровень типизации, \
+добавленный в JS, но что-то добавленное в я зык и рантайм. Вы должны знать, что такая фича существует, но возможно вам \
+нужно отложить её использование, пока вы не будете уверены. [Enum reference page](https://www.typescriptlang.org/docs/handbook/enums.html).
+
+#### Numeric Enums
+
+Числовое перечисление, в котором членам присваиваются номера. При инициализации номер 1, все последующие члены \
+автоматически увеличиваются на единицу. Можно полностью обойтись без нумерации. В этом случае первому члену \
+списка присваивается ноль. Авто прибавление полезно, для случаев, когда мы можем не заботиться о самих значениях членов, \
+но когда каждое значение последовательности отличается от других.
+
+```ts
+enum Direction {
+  Up = 1,
+  Down,
+  Left,
+  Right,
+}
+```
+
+Перечисление просто использовать: доступ к любому члену как свойству самого перечисления для объявления типа, \
+используется название перечисления.
+
+```ts
+enum UserResponse {
+  No = 0,
+  Yes = 1,
+}
+
+function respond(recipient: string, message: UserResponse): void {
+  console.log(`${recipient}: ${message}`);
+}
+
+respond("Princess Caroline", UserResponse.Yes);
+```
+
+**[⬆ back to top](#table-of-contents)**
+
+```ts
+function liveDangerously(x?: number | null) {
+  // No error
+  console.log(x.toFixed());
+}
+```
+
+Так же как и утверждение типов, эта проверка не меняет поведение кода во время выполнения. \
+Важно использовать `!`, когда вы точно знаете, что значение не может быть `null` или `undefined`.
 
 ### Utility Types
 
