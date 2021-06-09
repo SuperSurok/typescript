@@ -23,9 +23,14 @@
 [Type Aliases](#type-aliases)
 
 [Interfaces](#interfaces)
+
 [Differences Between Type Aliases and Interfaces](#differences-between-type-aliases-and-interfaces)
+
 [Type Assertions](#type-assertions)
-[Literal Types](#literal-types) - [Literal Inference](#literal-inference)
+
+[Literal Types](#literal-types) 
+- [Literal Inference](#literal-inference)
+
 [null and undefined](#null-and-undefined)
 
 [Utility Types](#utility-types)
