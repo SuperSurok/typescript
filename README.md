@@ -47,6 +47,13 @@
 - [bigint](#bigint)
 - [symbol](#symbol)
 
+[Narrowing](#narrowing)
+
+[More on Functions](#more-on-functions)
+
+- [Function Type Expressions](#function-type-expressions)
+- [Call Signatures](#call-signatures)
+
 [Utility Types](#utility-types)
 
 - [`Partial<Type>`](#partialtype)
@@ -61,7 +68,7 @@
 - [`Parameters<Type>`](#parameterstype)
 - [`ConstructorParameters<Type>`](#constructorparameterstype)
 
-### Basic Types
+## Basic Types
 
 #### `Primitives`
 
@@ -134,7 +141,7 @@ names.forEach((s) => console.log(s.toUppercase())); // => Error
 
 **[⬆ back to top](#table-of-contents)**
 
-### Object Types
+## Object Types
 
 Чтобы описать тип объекта, нужно просто перечислить его свойства и присвоить им типы.
 
@@ -592,7 +599,62 @@ if (firstName === secondName) {
 
 **[⬆ back to top](#table-of-contents)**
 
-### Utility Types
+## Narrowing
+
+### Need to read few times
+
+**[⬆ back to top](#table-of-contents)**
+
+## More on Functions
+
+### Function Type Expressions
+
+Самый простой способ описать функцию:
+
+```ts
+function greeter(fn: (a: string) => void) {
+  fn("Hello, world");
+}
+
+function printToConsole(s: string) {
+  console.log(s);
+}
+
+greeter(printToConsole);
+```
+
+> Необходимо явно указывать название параметра.
+> Функция с описанием `(string) => void`, означает функцию с названием параметра `string` и типом `any`.
+
+Также для типизирования функции можно использовать псевдоним типа:
+
+```ts
+type GreetFunction = (a: string) => void;
+function greeter(fn: greetFunction) {
+  // do something
+}
+```
+
+### Call Signatures
+
+В JS функци могут иметь свойства, которые могут быть вызваны. Синтаксис типизирование функционального выражения \
+не позволяет объявлять свойства. Если нужно описать, что-либо вызываемое со свойствами, можно написать сигнатуру \
+вызова в типе:
+
+```ts
+type DescribableFunction = {
+  description: string;
+  (someArg: number): boolean;
+};
+
+function doSomething(fn: DescribableFunction) {
+  console.log(`${fn.description} returned ${fn(6)}`)
+}
+```
+
+**[⬆ back to top](#table-of-contents)**
+
+## Utility Types
 
 #### `Partial<Type>`
 
