@@ -53,6 +53,8 @@
 
 - [Function Type Expressions](#function-type-expressions)
 - [Call Signatures](#call-signatures)
+- [Construct Signatures](#construct-signatures)
+- [Generic Functions](#generic-functions)
 
 [Utility Types](#utility-types)
 
@@ -648,11 +650,67 @@ type DescribableFunction = {
 };
 
 function doSomething(fn: DescribableFunction) {
-  console.log(`${fn.description} returned ${fn(6)}`)
+  console.log(`${fn.description} returned ${fn(6)}`);
 }
 ```
 
 **[⬆ back to top](#table-of-contents)**
+
+### Construct Signatures
+
+JS функции могут быть вызваны с оператором `new`. TS относит это к конструкторам, потому что 
+они обычно создают новый объект. Можно написать сигнатуру конструктора, добавив ключевое слово 
+`new` впереди сигнатуры вызова:
+
+```ts
+type SomeConstructor = {
+  new (s: string): SomeObject;
+};
+function fn(ctor: SomeConstructor) {
+  return new ctor("hello");
+}
+```
+
+Некоторые объекты, такие как `Date`, могут быть вызваны с или без `new`. Можно комбинировать вызов \
+и сигнатуры конструкторов в произвольной манере.
+
+```ts
+interface CallOrConstruct {
+  new (s: string): Date;
+  (n?: number): number;
+}
+```
+
+### Generic Functions
+
+Часто приходится писать функции, где типы ввода совпадают с типами вывода, или типы двух вводов 
+как-то связаны между собой. Для примера можно взять функцию, которая возвращает первый элемент массива.
+
+```ts
+function firstElement(arr: any[]) {
+  return arr[0];
+}
+```
+
+Функция будет работать, но возвращает тип `any`. Будет лучше, если будет возвращён тип элемента массива.
+В TS обобщения используются, когда нужно описать совпадения между двумя значениями. Можно сделать это 
+объявив параметр типа в сигнатуре функции:
+
+```ts
+function firstElement<Type>(arr: Type[]): Type {
+  return arr[0];
+}
+```
+
+Добавляя параметр тира `<Type>` и используя его в двух местах, создаётся ссылка между вводом функции (массив) 
+и выводом (возвращаемое значение). Т.о. при вызове функции, выводятся более специфичные типы.
+
+```ts
+// s is of type "string";
+const s = firstElement(["a", "b", "c"]);
+// n is of type "numbrer";
+const n = firstElement([1, 2, 3]);
+```
 
 ## Utility Types
 
