@@ -57,6 +57,7 @@
 - [Generic Functions](#generic-functions)
 - [Inference](#inference)
 - [Constraints](#constraints)
+- [Working with Constrained Values](#working-with-constrained-values)
 
 [Utility Types](#utility-types)
 
@@ -734,7 +735,7 @@ const parsed = map(["1", "2", "3"], (n) => parseInt(n));
 
 В этом примере TS вывел оба типа `Input` (из массива `string`) и также `Output` на основании возвращаемого значения `number`.
 
-## Constraint
+## Constraints
 
 Мы написали несколько обобщающих функций, которые могут работать с любыми видами значений. Иногда нужно соотнести два значения,
 но есть возможность оперировать только с определённым подмножеством значений. В этом случае можно использовать `ограничение`,
@@ -757,6 +758,36 @@ const longerArray = longest([1, 2, 3], [1, 3]);
 const longerString = longest("alice", "bob");
 // Error! Number don'tn have a 'length' property
 const notOk = longest(10, 100);
+```
+
+При ограничении `Type` до `{ length: number }`, мы получили доступ к свойству `.length` параметров `a` и `b`.
+Без ограничения мы бы не получили доступ к этому свойству, потому что значения могли бы быть любого другого типа без свойства `length`.
+
+## Working with Constrained Values
+
+Часто встречающаяся ошибка при работе с обобщёнными ограничениями.
+
+```ts
+function minimumLength<Type extends { length: number }>(
+  obj: Type,
+  minimum: number
+): Type {
+  if ((obj.length >= minimum)) {
+    return obj;
+  }
+
+  return { length: minimum };
+}
+```
+Возможно это выглядит, как рабочий код - `Type` ограничен до `{ length: number }`, и функция либо возвращает `Type`
+или значение сопоставимое с ограничением. Проблема в том, что функция обещает, что вернёт точно такой же объект, какой 
+был в неё передан, не просто какой-то объект, который сопоставим с ограничением. Если бы это было правильным, 
+можно было бы написать неработающий код.
+```ts
+// 'arr' gets value { length: 6 }
+const arr = minimumLength([1, 2], 6);
+// здесь упадёт с ошибкой, потому что у массива есть метод 'slice', которй возращает длину, а не объект
+console.log(arr.slice(0)); // => error
 ```
 
 ## Utility Types
