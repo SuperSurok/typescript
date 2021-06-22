@@ -58,6 +58,7 @@
 - [Inference](#inference)
 - [Constraints](#constraints)
 - [Working with Constrained Values](#working-with-constrained-values)
+- [Specifying Type Arguments](#specifying-type-arguments)
 
 [Utility Types](#utility-types)
 
@@ -684,6 +685,8 @@ interface CallOrConstruct {
 }
 ```
 
+**[⬆ back to top](#table-of-contents)**
+
 ### Generic Functions
 
 Часто приходится писать функции, где типы ввода совпадают с типами вывода, или типы двух вводов
@@ -715,6 +718,8 @@ const s = firstElement(["a", "b", "c"]);
 const n = firstElement([1, 2, 3]);
 ```
 
+**[⬆ back to top](#table-of-contents)**
+
 ## Inference
 
 Нужно отметить, что мы не уточняли `Type` в примере выше. Тип был выведен — выбран автоматически самим TS. \
@@ -734,6 +739,8 @@ const parsed = map(["1", "2", "3"], (n) => parseInt(n));
 ```
 
 В этом примере TS вывел оба типа `Input` (из массива `string`) и также `Output` на основании возвращаемого значения `number`.
+
+**[⬆ back to top](#table-of-contents)**
 
 ## Constraints
 
@@ -763,6 +770,8 @@ const notOk = longest(10, 100);
 При ограничении `Type` до `{ length: number }`, мы получили доступ к свойству `.length` параметров `a` и `b`.
 Без ограничения мы бы не получили доступ к этому свойству, потому что значения могли бы быть любого другого типа без свойства `length`.
 
+**[⬆ back to top](#table-of-contents)**
+
 ## Working with Constrained Values
 
 Часто встречающаяся ошибка при работе с обобщёнными ограничениями.
@@ -772,23 +781,48 @@ function minimumLength<Type extends { length: number }>(
   obj: Type,
   minimum: number
 ): Type {
-  if ((obj.length >= minimum)) {
+  if (obj.length >= minimum) {
     return obj;
   }
 
   return { length: minimum };
 }
 ```
+
 Возможно это выглядит, как рабочий код - `Type` ограничен до `{ length: number }`, и функция либо возвращает `Type`
-или значение сопоставимое с ограничением. Проблема в том, что функция обещает, что вернёт точно такой же объект, какой 
-был в неё передан, не просто какой-то объект, который сопоставим с ограничением. Если бы это было правильным, 
+или значение сопоставимое с ограничением. Проблема в том, что функция обещает, что вернёт точно такой же объект, какой
+был в неё передан, не просто какой-то объект, который сопоставим с ограничением. Если бы это было правильным,
 можно было бы написать неработающий код.
+
 ```ts
 // 'arr' gets value { length: 6 }
 const arr = minimumLength([1, 2], 6);
 // здесь упадёт с ошибкой, потому что у массива есть метод 'slice', которй возращает длину, а не объект
 console.log(arr.slice(0)); // => error
 ```
+
+**[⬆ back to top](#table-of-contents)**
+
+## Specifying Type Arguments
+
+TS обычно может вывести предполагаемые типы аргументов в общем вызове, но не всегда.\
+Этот пример вернёт ошибку:
+
+```ts
+function combine<Type>(arr1: Type[], arr2: Type[]): Type[] {
+  return arr1.concat(arr2);
+}
+
+const arr = ([1, 2, 3], ["hello"]); // => Type string is not assignable to type number.
+```
+
+Можно определить тип `<Type>` следующим образом:
+
+```ts
+const arr = combine<string | number>([1, 2, 3], [hello]);
+```
+
+**[⬆ back to top](#table-of-contents)**
 
 ## Utility Types
 
