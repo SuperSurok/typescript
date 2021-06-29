@@ -62,7 +62,9 @@
 - [Guidelines for Writing Good Generics Functions](#guidelines-for-writing-good-generics-functions)
 - [Optional Parameters](#optional-parameters)
 - [Optional Parameters in Callbacks](#optional-parameters-in-callbacks)
-- [Function Overload](#function-overload)
+- [Function Overloads](#function-overloads)
+  - [Overload Signatures and the Implementation Signature](#overload-signatures-and-the-implementation-signature)
+- [Writing Good Overloads](#writing-good-overloads)
 
 [Utility Types](#utility-types)
 
@@ -919,7 +921,7 @@ myForEach([1, 2, 3], (a, i) => {
 
 **[⬆ back to top](#table-of-contents)**
 
-## Function Overload
+## Function Overloads
 
 Некоторые функции могут принимать неопределённое количество аргументов и типов. Например, это может быть
 функция возвращающая дату `Date`. В TS можно указать функцию, которая может быть вызвана разными способами
@@ -975,6 +977,41 @@ function fn(x: string | number) {
   return "x";
 }
 ```
+
+## Writing Good Overloads
+
+Следуя этим принципам написания перегрузок, функции будет проще вызывать, проще понимать и проще реализовывать.
+Предположим, что мы хотим реализовать функцию, которая возвращает длину строки или массива:
+
+```ts
+function len(s: string): number;
+function len(arr: any[]): number;
+function len(x: any) {
+  return x.len;
+}
+```
+
+Вроде бы всё ок. Можно вызвать со строкой или массивом. Однако, нельзя её вызвать со значением, которое может быть
+строкой <i>или</i> массивом. TS может разрешить вызов функции только с одной перегрузкой.
+
+```ts
+len(""); // => OK
+len([0]); // => OK
+len(Math.random() > 0, 5 ? "hello" : [0]); // => No overload mathces this call.
+```
+
+Потому что обе перегрузки имеют одинаковое количество аргументов и оди и тот же тип возвращаемого значения. Вместо этого
+можно написать функцию без перегрузки:
+
+```ts
+function len(x: any[] | string) {
+  return x.length;
+}
+```
+
+<blockquote style="background-color:#f1f1fe; border-left: 2px solid "><p>Всегда предпочтительней параметры с объединёнными типами, чем описание перегрузок</p></blockquote>
+
+
 
 **[⬆ back to top](#table-of-contents)**
 
