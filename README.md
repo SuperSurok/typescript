@@ -58,6 +58,13 @@
 - [Inference](#inference)
 - [Constraints](#constraints)
 - [Working with Constrained Values](#working-with-constrained-values)
+- [Specifying Type Arguments](#specifying-type-arguments)
+- [Guidelines for Writing Good Generics Functions](#guidelines-for-writing-good-generics-functions)
+- [Optional Parameters](#optional-parameters)
+- [Optional Parameters in Callbacks](#optional-parameters-in-callbacks)
+- [Function Overloads](#function-overloads)
+  - [Overload Signatures and the Implementation Signature](#overload-signatures-and-the-implementation-signature)
+- [Writing Good Overloads](#writing-good-overloads)
 
 [Utility Types](#utility-types)
 
@@ -684,6 +691,8 @@ interface CallOrConstruct {
 }
 ```
 
+**[⬆ back to top](#table-of-contents)**
+
 ### Generic Functions
 
 Часто приходится писать функции, где типы ввода совпадают с типами вывода, или типы двух вводов
@@ -715,6 +724,8 @@ const s = firstElement(["a", "b", "c"]);
 const n = firstElement([1, 2, 3]);
 ```
 
+**[⬆ back to top](#table-of-contents)**
+
 ## Inference
 
 Нужно отметить, что мы не уточняли `Type` в примере выше. Тип был выведен — выбран автоматически самим TS. \
@@ -734,6 +745,8 @@ const parsed = map(["1", "2", "3"], (n) => parseInt(n));
 ```
 
 В этом примере TS вывел оба типа `Input` (из массива `string`) и также `Output` на основании возвращаемого значения `number`.
+
+**[⬆ back to top](#table-of-contents)**
 
 ## Constraints
 
@@ -763,6 +776,8 @@ const notOk = longest(10, 100);
 При ограничении `Type` до `{ length: number }`, мы получили доступ к свойству `.length` параметров `a` и `b`.
 Без ограничения мы бы не получили доступ к этому свойству, потому что значения могли бы быть любого другого типа без свойства `length`.
 
+**[⬆ back to top](#table-of-contents)**
+
 ## Working with Constrained Values
 
 Часто встречающаяся ошибка при работе с обобщёнными ограничениями.
@@ -772,23 +787,233 @@ function minimumLength<Type extends { length: number }>(
   obj: Type,
   minimum: number
 ): Type {
-  if ((obj.length >= minimum)) {
+  if (obj.length >= minimum) {
     return obj;
   }
 
   return { length: minimum };
 }
 ```
+
 Возможно это выглядит, как рабочий код - `Type` ограничен до `{ length: number }`, и функция либо возвращает `Type`
-или значение сопоставимое с ограничением. Проблема в том, что функция обещает, что вернёт точно такой же объект, какой 
-был в неё передан, не просто какой-то объект, который сопоставим с ограничением. Если бы это было правильным, 
+или значение сопоставимое с ограничением. Проблема в том, что функция обещает, что вернёт точно такой же объект, какой
+был в неё передан, не просто какой-то объект, который сопоставим с ограничением. Если бы это было правильным,
 можно было бы написать неработающий код.
+
 ```ts
 // 'arr' gets value { length: 6 }
 const arr = minimumLength([1, 2], 6);
 // здесь упадёт с ошибкой, потому что у массива есть метод 'slice', которй возращает длину, а не объект
 console.log(arr.slice(0)); // => error
 ```
+
+**[⬆ back to top](#table-of-contents)**
+
+## Specifying Type Arguments
+
+TS обычно может вывести предполагаемые типы аргументов в общем вызове, но не всегда.\
+Этот пример вернёт ошибку:
+
+```ts
+function combine<Type>(arr1: Type[], arr2: Type[]): Type[] {
+  return arr1.concat(arr2);
+}
+
+const arr = ([1, 2, 3], ["hello"]); // => Type string is not assignable to type number.
+```
+
+Можно определить тип `<Type>` следующим образом:
+
+```ts
+const arr = combine<string | number>([1, 2, 3], [hello]);
+```
+
+**[⬆ back to top](#table-of-contents)**
+
+## Guidelines for Writing Good Generics Functions
+
+В примере ниже объявление типов для функции `firstElement1` выглядит более лаконичным и лучшим способом.
+Функция явно возвращает тип `Type`. В `firstElement2` возвращаемый тип значения `any`, потому что TS должен
+вычислить какой тип у выражения `arr[0]`, используя ограничение типа, скорее, чем ожидать вычисление элемента
+в течение вызова.
+
+### Push Type Parameters Down
+
+```ts
+function firstElement1<Type>(arr: Type[]) {
+  return arr[0];
+}
+function firstElement2<Type extends any[]>(arr: Type) {
+  return arr[0];
+}
+
+// a: number(good);
+const a = firstElement1([1, 2, 3]);
+// b: any(bad)
+const b = firstElement2([1, 2, 3]);
+```
+
+### Use Fewer Type Parameters
+
+В этом примере тип `Func` не связывает два значения. Это означает, что здесь нужно вручную описать определение типа.
+`Func` ничего не делает, а только создаёт трудности для чтения.
+
+```ts
+function filter1<Type>(arr: Type[], func: (arg: Type) => boolean): Type[] {
+  return arr.filter(func);
+}
+
+function filter2<Type, Func extends (arg: Type) => boolean>(
+  arr: Type,
+  func: Func
+): Type[] {
+  return arr.filter(func);
+}
+```
+
+**[⬆ back to top](#table-of-contents)**
+
+## Optional Parameters
+
+Опциональный параметр функции обозначается знаком `?`. В этом случае тип параметра будет `number | undefined`,
+т.к. неопределённые параметры в JS получают значение `undefined`.
+Если параметр опциональный, его первоначальное значение будет `undefined`.
+
+```ts
+function fn(n?: number) {
+  return n;
+}
+
+fn(); // => ok
+fn(10); // => ok
+```
+
+#### Параметры по умолчанию.
+
+В данном случае тип параметра всегда будет `number`, т.к. если при вызове функции не передать аргумент,
+ему автоматически будет присвоено значение 10.
+
+```ts
+function fn(x = 10) {
+  return x;
+}
+```
+
+## Optional Parameters in Callbacks
+
+Этот код содержит ошибку, т.к. в параметрах коллбэка нельзя указывать параметры по умолчанию.
+
+```ts
+function myForEach(arr: any[], cb: (arg: any, index?: number) => void) {
+  for (let i = 0; i < arr.length; i += 1) {
+    console.log(arr[i], i);
+  }
+}
+
+myForEach([1, 2, 3], (a, i) => {
+  console.log(i.toFixed()); // => Object is possibly 'undefined'.
+});
+```
+
+В JS, если вызвать функцию с большим количеством аргументов, чем параметров, то этим аргументам будет
+присвоено значение `undefined`. Функции с меньшим количеством параметров (того же типа) всегда могут
+заменить функцию с меньшим количеством параметров.
+
+**[⬆ back to top](#table-of-contents)**
+
+## Function Overloads
+
+Некоторые функции могут принимать неопределённое количество аргументов и типов. Например, это может быть
+функция возвращающая дату `Date`. В TS можно указать функцию, которая может быть вызвана разными способами
+написав сигнатуру перегрузки. Чтобы сделать это, нужно написать несколько сигнатур (две и более) перед телом
+вызываемой функции,
+
+```ts
+function makeDate(timestmpg: number): Date;
+function makeDate(m: number, d: number, y: number): Date;
+function makeDate(mOrTimeStamp: number, d?: number, y?: number): Date {
+  if (d !== undefined && y !== undefined) {
+    return new Date(y, mOrTimeStamp, y);
+  } else {
+    return new Date(mOrTimeStamp);
+  }
+}
+
+const d1 = makeDate(12345678);
+const d2 = makeDate(5, 5, 5);
+const d3 = makeDate(1, 3); // => No overload expects 2 arguments, but overloads do exist that expect either 1 or 3 arguments.
+```
+
+В этом примере кода написано две перегрузки: первая принимает один аргумент, вторая принимает три аргумента.
+Далее написана реализация функции с сопоставимой сигнатурой. У функции описана реализация сигнатуры, но она
+не может быть вызвана. Если функция с двумя опциональными параметрами написана после функции, в которой есть хотя бы
+одни обязательный, она не может быть вызвана с двумя параметрам.
+
+### Overload Signatures and the Implementation Signature
+
+Код ниже написан с ошибкой, так для описания перегрузки необходимо написать две или более перегрузки выше
+реализации функции.
+
+```ts
+function fn(x: string): void;
+function fn() {}
+
+fu(); // => Expect 1 arguments, but got 0.
+```
+
+Описание реализации должно быть совместимым с описанием перегрузки. Код ниже написан не правильно, т.к.
+описание реализации не совпадает с перегрузкой правильным образом.
+
+```ts
+function fn(x: boolean): void;
+function fn(x: string): void; // => This overload signature not compatible with its implementation signature.
+
+function fn(x: boolean) {}
+
+function fn(x: string): string;
+function fn(x: number): boolean; // => This overload signature is not compatible its implementation signature.
+
+function fn(x: string | number) {
+  return "x";
+}
+```
+
+## Writing Good Overloads
+
+Следуя этим принципам написания перегрузок, функции будет проще вызывать, проще понимать и проще реализовывать.
+Предположим, что мы хотим реализовать функцию, которая возвращает длину строки или массива:
+
+```ts
+function len(s: string): number;
+function len(arr: any[]): number;
+function len(x: any) {
+  return x.len;
+}
+```
+
+Вроде бы всё ок. Можно вызвать со строкой или массивом. Однако, нельзя её вызвать со значением, которое может быть
+строкой <i>или</i> массивом. TS может разрешить вызов функции только с одной перегрузкой.
+
+```ts
+len(""); // => OK
+len([0]); // => OK
+len(Math.random() > 0, 5 ? "hello" : [0]); // => No overload mathces this call.
+```
+
+Потому что обе перегрузки имеют одинаковое количество аргументов и оди и тот же тип возвращаемого значения. Вместо этого
+можно написать функцию без перегрузки:
+
+```ts
+function len(x: any[] | string) {
+  return x.length;
+}
+```
+
+<blockquote style="background-color:#f1f1fe; border-left: 2px solid "><p>Всегда предпочтительней параметры с объединёнными типами, чем описание перегрузок</p></blockquote>
+
+
+
+**[⬆ back to top](#table-of-contents)**
 
 ## Utility Types
 
