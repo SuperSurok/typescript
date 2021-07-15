@@ -1021,7 +1021,7 @@ function len(x: any[] | string) {
 
 Возвращает `Type` с опциональными полями.
 
-Кастомная реализация `Partial`: `type MyPartial<T> = { [P in keyof T]: T[P] }`
+Кастомная реализация `Partial`: `type MyPartial<T> = { [P in keyof T]?: T[P] }`
 
 ##### Пример
 
