@@ -1011,8 +1011,6 @@ function len(x: any[] | string) {
 
 <blockquote style="background-color:#f1f1fe; border-left: 2px solid "><p>Всегда предпочтительней параметры с объединёнными типами, чем описание перегрузок</p></blockquote>
 
-
-
 **[⬆ back to top](#table-of-contents)**
 
 ## Utility Types
@@ -1086,6 +1084,12 @@ todo.title = "Hello!"; // => ошибка
 Даёт возможность составить один тип из двух типов.
 
 ##### Пример
+
+Реализация `Record`:
+
+```ts
+type MyRecord<K extends number | string | symbol, T> = { [P in K]: T };
+```
 
 ```ts
 type CatInfo = {
