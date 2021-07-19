@@ -1108,11 +1108,10 @@ const cats: Record<CatName, CatInfo> = {
 cats.boris; // => const cats: Record<CatName, CatInfo>
 ```
 
-#### `
-<Type,Keys>`
+#### `Pick<Type,Keys>`
 
-Создаёт тип собирая набор необходимых свойств `Keys`\
-(строковый литерал или объединение строковых литералов) из `<Type>`
+Создаёт тип собирая набор необходимых свойств `Keys` (строковый литерал или объединение строковых литералов) из `<Type>`.
+Внутренняя реализация: `type MyPick<T, Keys exetnds typeof T> = { [P in K]: T[P] }`.
 
 ##### Пример
 
