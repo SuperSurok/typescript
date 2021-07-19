@@ -1087,6 +1087,8 @@ todo.title = "Hello!"; // => ошибка
 Эта утилита может быть полезна для сопоставления свойств одного типа с другим типом.  
 Даёт возможность составить один тип из двух типов.
 
+Внутренняя реализация: `type MyRecord<K extends string | number | symbol, T> = { [P in K]: T}`
+
 ##### Пример
 
 ```ts
@@ -1106,7 +1108,8 @@ const cats: Record<CatName, CatInfo> = {
 cats.boris; // => const cats: Record<CatName, CatInfo>
 ```
 
-#### `Pick<Type,Keys>`
+#### `
+<Type,Keys>`
 
 Создаёт тип собирая набор необходимых свойств `Keys`\
 (строковый литерал или объединение строковых литералов) из `<Type>`
