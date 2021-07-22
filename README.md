@@ -65,6 +65,7 @@
 - [Function Overloads](#function-overloads)
   - [Overload Signatures and the Implementation Signature](#overload-signatures-and-the-implementation-signature)
 - [Writing Good Overloads](#writing-good-overloads)
+- [Declaring `this` in a Function](#Declaring-`this`-in-a-Function)
 
 [Utility Types](#utility-types)
 
@@ -1012,6 +1013,51 @@ function len(x: any[] | string) {
 <blockquote style="background-color:#f1f1fe; border-left: 2px solid "><p>Всегда предпочтительней параметры с объединёнными типами, чем описание перегрузок</p></blockquote>
 
 **[⬆ back to top](#table-of-contents)**
+
+## Declaring `this` in a Function
+
+TS определяет, что `this` должно быть функцией через анализ кода, например:
+
+```ts
+const user = {
+  id: 123,
+
+  admin: false,
+  becomeAdmin: function () {
+    this.admin = true;
+  },
+};
+```
+
+TS понимает, что функция `user.becomeAdmin` соответствует `this` объекта `user`.
+`this` достаточно для большинства случаев, но существует множество вариантов действий,
+когда необходим больший контроль, чем предоставляет `this` объекта. Спецификация JS определяет,
+что у нас не может быть параметра, называемого `this`, и таким образом TS использует пространство
+синтаксиса, чтобы позволить объявить тип для `this` в теле функции.
+
+```ts
+interface DB {
+  filterUsers(filter: (this: User) => boolean): User[];
+}
+
+const db = getDB();
+const admins = db.filterUsers(function (this: User) {
+  return this.admin;
+});
+```
+
+Следующий пример, это общий паттерн коллбэк стиля, когда другой объект обычно контролирует при вызове функции.
+Нужно отметить, что необходимо использовать обычную функцию `function`, чтобы получить это поведение.
+
+```ts
+interface DB {
+  filterUsers(filter: (this: User) => boolean): User[];
+}
+const db = getDB();
+const admins = db.filterUsers(() => this.admin); // => error
+// The containing arrow function captures the global value of 'this'.
+// Element implicitly has an 'any' type because type 'typeof globalThis' has no index signature.
+```
 
 ## Utility Types
 
